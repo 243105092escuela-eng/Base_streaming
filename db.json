@@ -1,23 +1,30 @@
 [
   {
     "id": 1,
-    "titulo": "Chainsaw Man",
-    "episodio": "Trailer Oficial",
-    "poster": "https://m.media-amazon.com/images/M/MV5BNmU2N2E1ZGMtYjE4MS00NzQ0LWI4YzUtZDIzY2I3N2QzYmY3XkEyXkFqcGc@._V1_.jpg",
-    "videoUrl": "https://www.youtube.com/embed/v4yLeN6G69s"
+    "titulo": "Lofi Hip Hop Radio",
+    "episodio": "Beats to Relax/Study",
+    "poster": "https://i.ytimg.com/vi/jfKfPfyJRdk/maxresdefault.jpg",
+    "videoUrl": "https://www.youtube.com/embed/jfKfPfyJRdk"
   },
   {
     "id": 2,
-    "titulo": "One Piece",
-    "episodio": "Wano Kuni",
-    "poster": "https://m.media-amazon.com/images/M/MV5BMjE4MDYzNzg3MV5BMl5BanBnXkFtZTgwNjIyMzE0MDE@._V1_.jpg",
-    "videoUrl": "https://www.youtube.com/embed/S8_YwSjs89I"
+    "titulo": "Smooth Jazz Live",
+    "episodio": "Ambiente Relajante",
+    "poster": "https://i.ytimg.com/vi/5W0S1LlSOnA/maxresdefault.jpg",
+    "videoUrl": "https://www.youtube.com/embed/5W0S1LlSOnA"
   },
   {
     "id": 3,
-    "titulo": "Demon Slayer",
-    "episodio": "Trailer",
-    "poster": "https://m.media-amazon.com/images/M/MV5BNTkwOTE1ZDYtYWQ3AS00MmU3LThmN2EtNmI2ZGM2OTY1ZDIxXkEyXkFqcGc@._V1_.jpg",
-    "videoUrl": "https://www.youtube.com/embed/VQGCKyNIszU"
+    "titulo": "Synthwave Radio",
+    "episodio": "Retro Drive 24/7",
+    "poster": "https://i.ytimg.com/vi/4xDzrJKXOOY/maxresdefault.jpg",
+    "videoUrl": "https://www.youtube.com/embed/4xDzrJKXOOY"
+  },
+  {
+    "id": 4,
+    "titulo": "Piano Relajante",
+    "episodio": "Música para Dormir",
+    "poster": "https://i.ytimg.com/vi/77ZozI0rw7w/maxresdefault.jpg",
+    "videoUrl": "https://www.youtube.com/embed/77ZozI0rw7w"
   }
 ]
