@@ -3,85 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnimeStream | Live</title>
+    <title>BeatFlow | Tu Radio 24/7</title>
     <style>
-        :root { --primary: #ff4500; --bg: #0a0a0a; --card: #161616; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; text-align: center; }
-        header { padding: 20px; border-bottom: 2px solid var(--primary); background: #1a1a1a; }
-        .player-section { max-width: 800px; margin: 20px auto; padding: 10px; }
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 8px; overflow: hidden; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; padding: 20px; max-width: 1000px; margin: auto; }
-        .anime-card { background: var(--card); border-radius: 8px; cursor: pointer; transition: 0.3s; border: 1px solid #333; overflow: hidden; }
-        .anime-card:hover { transform: scale(1.05); border-color: var(--primary); }
-        .anime-card img { width: 100%; height: 200px; object-fit: cover; }
-        .card-info { padding: 10px; font-size: 14px; }
+        /* COLORES ESTILO SYNTHWAVE */
+        :root {
+            --primary: #bc13fe; /* Morado neón */
+            --secondary: #ff00de; /* Rosa neón */
+            --bg-dark: #050505;
+            --bg-card: #121212;
+            --text-main: #ffffff;
+            --text-gray: #a0a0a0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a0033 0%, #050505 100%);
+            padding: 25px;
+            text-align: center;
+            border-bottom: 3px solid var(--primary);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        header h1 {
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            font-size: 2rem;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        header span {
+            color: var(--secondary);
+            text-shadow: 0 0 10px var(--secondary);
+        }
+
+        /* REPRODUCTOR */
+        .player-section {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        #current-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--secondary);
+            font-weight: 300;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; 
+            height: 0;
+            background: #000;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.2);
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        /* ATRIBUTOS PARA AUTOPLAY */
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* GRID DE ESTACIONES */
+        .catalog-container {
+            max-width: 1100px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--secondary);
+            padding-left: 15px;
+        }
+
+        #anime-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 30px;
+        }
+
+        /* TARJETAS MUSICALES */
+        .anime-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border 0.3s;
+            border: 1px solid #222;
+        }
+
+        .anime-card:hover {
+            transform: scale(1.08);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.4);
+        }
+
+        .anime-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            filter: grayscale(30%);
+            transition: 0.3s;
+        }
+
+        .anime-card:hover img {
+            filter: grayscale(0%);
+        }
+
+        .card-info {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .card-info strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .card-info small {
+            color: var(--text-gray);
+            font-size: 0.8rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-gray);
+            font-size: 0.8rem;
+            background: #000;
+        }
     </style>
 </head>
 <body>
 
-<header><h1>ANIME<span style="color:var(--primary)">STREAM</span></h1></header>
+    <header>
+        <h1>BEAT<span>FLOW</span></h1>
+    </header>
 
-<div class="player-section">
-    <h2 id="current-title">Selecciona un video</h2>
-    <div class="video-container">
-        <iframe id="video-player" src="" allowfullscreen></iframe>
-    </div>
-</div>
+    <main>
+        <section class="player-section">
+            <h2 id="current-title">Selecciona una estación para comenzar</h2>
+            <div class="video-container">
+                <iframe 
+                    id="video-player" 
+                    src="" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </section>
 
-<div class="catalog" id="anime-list">
-    <p id="status">Cargando base de datos...</p>
-</div>
+        <section class="catalog-container">
+            <h2 class="section-title">Estaciones Disponibles</h2>
+            <div id="anime-list">
+                <p id="status" style="color: var(--text-gray);">Sincronizando frecuencias...</p>
+            </div>
+        </section>
+    </main>
 
-<script>
-    // USAMOS UNA RUTA RELATIVA SIMPLE
-    async function iniciarApp() {
-        const catalogo = document.getElementById('anime-list');
-        const status = document.getElementById('status');
+    <footer>
+        <p>BeatFlow Radio &copy; 2026</p>
+        <p>Transmisiones vía YouTube Media Player</p>
+    </footer>
 
-        try {
-            // Intentamos cargar db.json
-            const res = await fetch('./db.json');
-            
-            if (!res.ok) throw new Error("Archivo db.json no encontrado");
-
-            const datos = await res.json();
-            
-            if (datos.length === 0) {
-                status.innerText = "La base de datos está vacía.";
-                return;
-            }
-
-            status.style.display = 'none';
-            catalogo.innerHTML = "";
-
-            datos.forEach(anime => {
-                const card = document.createElement('div');
-                card.className = 'anime-card';
-                card.innerHTML = `
-                    <img src="${anime.poster}">
-                    <div class="card-info">
-                        <strong>${anime.titulo}</strong><br>
-                        <small>${anime.episodio}</small>
-                    </div>
-                `;
-                
-                card.onclick = () => {
-                    document.getElementById('video-player').src = anime.videoUrl;
-                    document.getElementById('current-title').innerText = anime.titulo;
-                    window.scrollTo({top: 0, behavior: 'smooth'});
-                };
-                
-                catalogo.appendChild(card);
-            });
-
-        } catch (error) {
-            console.error(error);
-            status.innerHTML = `<span style="color:red">Error: No se pudo cargar db.json. Revisa que el archivo exista en tu GitHub.</span>`;
-        }
-    }
-
-    window.onload = iniciarApp;
-</script>
+    <script src="script.js"></script>
 </body>
 </html>
