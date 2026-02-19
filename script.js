@@ -1,34 +1,55 @@
-// Función para cargar los datos del JSON
-async function loadAnime() {
+// Función principal para obtener los datos del JSON y mostrarlos
+async function cargarAnimeDB() {
     try {
-        // Buscamos el archivo db.json en la misma carpeta
-        const response = await fetch('db.json');
-        const animes = await response.json();
+        // 1. Buscamos el archivo db.json (asegúrate de que estén en la misma carpeta)
+        const respuesta = await fetch('db.json');
         
-        const listContainer = document.getElementById('anime-list');
+        // Convertimos la respuesta a un formato que JS entienda (objeto)
+        const listaAnimes = await respuesta.json();
+
+        // 2. Seleccionamos el contenedor donde se mostrarán las portadas
+        const catalogo = document.getElementById('anime-list');
         
-        animes.forEach(anime => {
-            // Crear el elemento visual para cada anime
-            const card = document.createElement('div');
-            card.classList.add('anime-card');
-            card.innerHTML = `
-                <img src="${anime.poster}" alt="${anime.titulo}">
-                <h3>${anime.titulo} - ${anime.episodio}</h3>
+        // Limpiamos el catálogo por si acaso hay algo escrito
+        catalogo.innerHTML = "";
+
+        // 3. Recorremos cada anime de nuestra "base de datos"
+        listaAnimes.forEach(anime => {
+            // Creamos el elemento visual de la tarjeta
+            const tarjeta = document.createElement('div');
+            tarjeta.classList.add('anime-card');
+
+            // Le inyectamos el HTML con la imagen y el título
+            tarjeta.innerHTML = `
+                <img src="${anime.poster}" alt="${anime.titulo}" loading="lazy">
+                <div class="card-info">
+                    <h3>${anime.titulo}</h3>
+                    <span>${anime.episodio}</span>
+                </div>
             `;
-            
-            // Evento para cambiar el video al hacer clic
-            card.onclick = () => {
-                document.getElementById('video-player').src = anime.videoUrl;
-                document.getElementById('current-title').innerText = `${anime.titulo} - ${anime.episodio}`;
+
+            // 4. Agregamos el evento de CLICK para reproducir el video
+            tarjeta.addEventListener('click', () => {
+                // Cambiamos el src del iframe por el videoUrl del JSON
+                const reproductor = document.getElementById('video-player');
+                const tituloPrincipal = document.getElementById('current-title');
+
+                reproductor.src = anime.videoUrl;
+                tituloPrincipal.innerText = `${anime.titulo} - ${anime.episodio}`;
+
+                // Efecto visual: subir al reproductor automáticamente
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            };
-            
-            listContainer.appendChild(card);
+            });
+
+            // Agregamos la tarjeta al catálogo
+            catalogo.appendChild(tarjeta);
         });
+
     } catch (error) {
-        console.error("Error cargando la base de datos:", error);
+        console.error("Hubo un error cargando el catálogo de anime:", error);
+        document.getElementById('anime-list').innerHTML = "<p>Error al cargar los videos. Intenta de nuevo más tarde.</p>";
     }
 }
 
-// Iniciar la carga al abrir la página
-loadAnime();
+// Llamamos a la función cuando la página esté lista
+document.addEventListener('DOMContentLoaded', cargarAnimeDB);
