@@ -1,9 +1,22 @@
-// 1. LÓGICA DE REGISTRO DE IDENTIDAD
+// 1. LÓGICA DE REGISTRO MEJORADA
 function registrarUsuario() {
-    const nombre = document.getElementById('user-input').value;
-    if (nombre.trim() !== "") {
-        localStorage.setItem('beatflow_user', nombre);
+    const nombre = document.getElementById('user-input').value.trim();
+    
+    if (nombre !== "") {
+        // Obtenemos la lista actual de usuarios o creamos una vacía si no existe
+        let usuarios = JSON.parse(localStorage.getItem('beatflow_users_list')) || [];
+        
+        // Agregamos el nuevo nombre si no está ya en la lista
+        if (!usuarios.includes(nombre)) {
+            usuarios.push(nombre);
+            localStorage.setItem('beatflow_users_list', JSON.stringify(usuarios));
+        }
+
+        // Guardamos quién es el usuario actual
+        localStorage.setItem('beatflow_current_user', nombre);
+        
         mostrarInterfazUsuario(nombre);
+        actualizarListaPublica();
     } else {
         alert("Por favor, ingresa tu nombre.");
     }
@@ -11,57 +24,41 @@ function registrarUsuario() {
 
 function mostrarInterfazUsuario(nombre) {
     document.getElementById('register-modal').style.display = 'none';
-    document.getElementById('user-card').style.display = 'flex';
+    const userCard = document.getElementById('user-card');
+    userCard.style.display = 'flex';
     document.getElementById('display-name').innerText = nombre;
 }
 
-// 2. LÓGICA DE STREAMING DE MÚSICA
-async function cargarMusica() {
-    const catalogo = document.getElementById('anime-list');
-    const reproductor = document.getElementById('video-player');
-    const tituloPrincipal = document.getElementById('current-title');
-
-    try {
-        const res = await fetch('./db.json');
-        if (!res.ok) throw new Error("No se encontró db.json");
-        const canciones = await res.json();
-
-        catalogo.innerHTML = ""; 
-
-        canciones.forEach(track => {
-            const tarjeta = document.createElement('div');
-            tarjeta.className = 'anime-card';
-            tarjeta.innerHTML = `
-                <img src="${track.poster}" alt="${track.titulo}">
-                <div class="card-info">
-                    <strong>${track.titulo}</strong><br>
-                    <small>${track.episodio}</small>
-                </div>
-            `;
-
-            tarjeta.onclick = () => {
-                // Autoplay integrado + mute=0 para sonido activo
-                reproductor.src = track.videoUrl + "?autoplay=1&mute=0&rel=0";
-                tituloPrincipal.innerText = `Escuchando: ${track.titulo}`;
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            };
-
-            catalogo.appendChild(tarjeta);
-        });
-
-    } catch (error) {
-        catalogo.innerHTML = `<p style="color:red;">Error al cargar datos.</p>`;
+// 2. FUNCIÓN PARA MOSTRAR TODOS LOS USUARIOS
+function actualizarListaPublica() {
+    const listaDiv = document.getElementById('user-list');
+    const usuarios = JSON.parse(localStorage.getItem('beatflow_users_list')) || [];
+    
+    if (usuarios.length > 0) {
+        listaDiv.innerHTML = usuarios.map(u => 
+            `<span style="background: #222; padding: 5px 12px; border-radius: 15px; border: 1px solid #444;">${u}</span>`
+        ).join("");
+    } else {
+        listaDiv.innerHTML = "No hay usuarios registrados aún.";
     }
 }
 
-// 3. INICIO AUTOMÁTICO
+function cerrarSesion() {
+    localStorage.removeItem('beatflow_current_user');
+    window.location.reload();
+}
+
+// 3. INICIO
 document.addEventListener('DOMContentLoaded', () => {
-    // Verificar si ya hay nombre registrado
-    const usuario = localStorage.getItem('beatflow_user');
-    if (usuario) {
-        mostrarInterfazUsuario(usuario);
+    // Verificar usuario actual
+    const usuarioActual = localStorage.getItem('beatflow_current_user');
+    if (usuarioActual) {
+        mostrarInterfazUsuario(usuarioActual);
     }
 
-    // Cargar la música
+    // Cargar lista de todos los usuarios
+    actualizarListaPublica();
+    
+    // Cargar la música (tu función existente)
     cargarMusica();
 });
