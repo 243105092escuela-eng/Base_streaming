@@ -2,15 +2,15 @@
   {
     "id": 1,
     "titulo": "Naruto Shippuden",
-    "episodio": 1,
-    "poster": "https://url-de-tu-imagen.jpg",
-    "videoUrl": "https://www.youtube.com/embed/videoID1"
+    "episodio": "Episodio 01",
+    "poster": "https://via.placeholder.com/200x300?text=Naruto",
+    "videoUrl": "https://www.youtube.com/embed/eB6txyhHFG4"
   },
   {
     "id": 2,
     "titulo": "One Piece",
-    "episodio": 1000,
-    "poster": "https://url-de-tu-imagen2.jpg",
-    "videoUrl": "https://www.youtube.com/embed/videoID2"
+    "episodio": "Episodio 1000",
+    "poster": "https://via.placeholder.com/200x300?text=One+Piece",
+    "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ"
   }
 ]
