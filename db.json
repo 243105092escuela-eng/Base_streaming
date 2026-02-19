@@ -1,16 +1,58 @@
 [
   {
     "id": 1,
-    "titulo": "Naruto Shippuden",
-    "episodio": "Episodio 01",
-    "poster": "https://via.placeholder.com/200x300?text=Naruto",
-    "videoUrl": "https://www.youtube.com/embed/eB6txyhHFG4"
+    "titulo": "Chainsaw Man",
+    "episodio": "Trailer Oficial",
+    "poster": "https://www.crunchyroll.com/imgsrv/display/thumbnail/480x720/catalog/crunchyroll/922742d10348d4b3f025fbc0734005ba.jpe",
+    "videoUrl": "https://www.youtube.com/embed/v4yLeN6G69s"
   },
   {
     "id": 2,
+    "titulo": "Spy x Family",
+    "episodio": "Capítulo 01",
+    "poster": "https://www.crunchyroll.com/imgsrv/display/thumbnail/480x720/catalog/crunchyroll/689e2b1297746d5f7d3910c239454170.jpe",
+    "videoUrl": "https://www.youtube.com/embed/ePaX7MvPsc4"
+  },
+  {
+    "id": 3,
+    "titulo": "Demon Slayer (Kimetsu no Yaiba)",
+    "episodio": "Arco de la Aldea",
+    "poster": "https://www.crunchyroll.com/imgsrv/display/thumbnail/480x720/catalog/crunchyroll/f36660f73f3299c27931398857410c5e.jpe",
+    "videoUrl": "https://www.youtube.com/embed/VQGCKyNIszU"
+  },
+  {
+    "id": 4,
+    "titulo": "Jujutsu Kaisen",
+    "episodio": "Temporada 2",
+    "poster": "https://www.crunchyroll.com/imgsrv/display/thumbnail/480x720/catalog/crunchyroll/e838cc3d9643156274c880e60aa8b66d.jpe",
+    "videoUrl": "https://www.youtube.com/embed/PKH772U84m0"
+  },
+  {
+    "id": 5,
     "titulo": "One Piece",
-    "episodio": "Episodio 1000",
-    "poster": "https://via.placeholder.com/200x300?text=One+Piece",
-    "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    "episodio": "Arco de Wano",
+    "poster": "https://www.crunchyroll.com/imgsrv/display/thumbnail/480x720/catalog/crunchyroll/18988f119a42484252ef0e8156112f4b.jpe",
+    "videoUrl": "https://www.youtube.com/embed/S8_YwSjs89I"
+  },
+  {
+    "id": 6,
+    "titulo": "Attack on Titan",
+    "episodio": "The Final Season",
+    "poster": "https://www.crunchyroll.com/imgsrv/display/thumbnail/480x720/catalog/crunchyroll/273e03e33f67972cf7854197c1579413.jpe",
+    "videoUrl": "https://www.youtube.com/embed/E7WytAY2KvY"
+  },
+  {
+    "id": 7,
+    "titulo": "Solo Leveling",
+    "episodio": "Capítulo 01",
+    "poster": "https://www.crunchyroll.com/imgsrv/display/thumbnail/480x720/catalog/crunchyroll/6ce787095036928821935634568e647b.jpe",
+    "videoUrl": "https://www.youtube.com/embed/D8_v00DCO3M"
+  },
+  {
+    "id": 8,
+    "titulo": "My Hero Academia",
+    "episodio": "Temporada 7",
+    "poster": "https://www.crunchyroll.com/imgsrv/display/thumbnail/480x720/catalog/crunchyroll/2464971c0800d1c7f4749f50689b14f8.jpe",
+    "videoUrl": "https://www.youtube.com/embed/NfR26Y_N2Yw"
   }
 ]
