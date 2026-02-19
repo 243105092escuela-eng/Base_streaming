@@ -1,50 +1,43 @@
-async function cargarAnimeDB() {
+async function iniciarApp() {
     const catalogo = document.getElementById('anime-list');
-    
+    const status = document.getElementById('status');
+
+    // Usamos el link RAW directo de tu GitHub para evitar errores de ruta
+    const URL_DATABASE = "https://raw.githubusercontent.com/243105092escuela-eng/Base_streaming/main/db.json";
+
     try {
-        const respuesta = await fetch('db.json');
+        const res = await fetch(URL_DATABASE);
         
-        // Si el archivo no existe o no carga, usamos datos de respaldo manuales
-        let listaAnimes;
-        if (!respuesta.ok) {
-            console.warn("No se detectó db.json, cargando modo de prueba local.");
-            listaAnimes = [
-                {
-                    "titulo": "Prueba: Chainsaw Man",
-                    "episodio": "Trailer",
-                    "poster": "https://www.crunchyroll.com/imgsrv/display/thumbnail/480x720/catalog/crunchyroll/922742d10348d4b3f025fbc0734005ba.jpe",
-                    "videoUrl": "https://www.youtube.com/embed/v4yLeN6G69s"
-                }
-            ];
-        } else {
-            listaAnimes = await respuesta.json();
-        }
+        if (!res.ok) throw new Error("No se pudo conectar con la base de datos");
 
-        catalogo.innerHTML = ""; 
+        const datos = await res.json();
+        
+        catalogo.innerHTML = ""; // Limpiamos el mensaje de carga
 
-        listaAnimes.forEach(anime => {
-            const tarjeta = document.createElement('div');
-            tarjeta.className = 'anime-card';
-            tarjeta.innerHTML = `
-                <img src="${anime.poster}" alt="${anime.titulo}">
+        datos.forEach(anime => {
+            const card = document.createElement('div');
+            card.className = 'anime-card';
+            card.innerHTML = `
+                <img src="${anime.poster}" onerror="this.src='https://via.placeholder.com/200x300?text=Error+Imagen'">
                 <div class="card-info">
-                    <h3>${anime.titulo}</h3>
-                    <span>${anime.episodio}</span>
+                    <strong>${anime.titulo}</strong><br>
+                    <small>${anime.episodio}</small>
                 </div>
             `;
-
-            tarjeta.onclick = () => {
-                document.getElementById('video-player').src = anime.videoUrl;
+            
+            card.onclick = () => {
+                // Forzamos que el link sea de EMBED
+                let cleanUrl = anime.videoUrl.replace("watch?v=", "embed/");
+                document.getElementById('video-player').src = cleanUrl;
                 document.getElementById('current-title').innerText = anime.titulo;
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                window.scrollTo({top: 0, behavior: 'smooth'});
             };
-
-            catalogo.appendChild(tarjeta);
+            
+            catalogo.appendChild(card);
         });
 
-    } catch (e) {
-        catalogo.innerHTML = "<p>Error cargando datos. Asegúrate de que db.json existe.</p>";
+    } catch (error) {
+        console.error(error);
+        status.innerHTML = `<b style="color:red">Error de conexión:</b> Verifica que tu db.json sea público y tenga formato correcto.`;
     }
 }
-
-document.addEventListener('DOMContentLoaded', cargarAnimeDB);
