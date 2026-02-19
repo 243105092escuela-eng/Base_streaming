@@ -1,43 +1,60 @@
-async function iniciarApp() {
-    const catalogo = document.getElementById('anime-list');
+// Función principal para cargar la base de datos de música
+async function cargarMusica() {
+    const catalogo = document.getElementById('anime-list'); // Seguimos usando este ID de tu HTML
     const status = document.getElementById('status');
+    const reproductor = document.getElementById('video-player');
+    const tituloPrincipal = document.getElementById('current-title');
 
-    // Usamos el link RAW directo de tu GitHub para evitar errores de ruta
-    const URL_DATABASE = "https://raw.githubusercontent.com/243105092escuela-eng/Base_streaming/main/db.json";
+    // URL de tu base de datos en GitHub (puedes usar './db.json' si prefieres)
+    const URL_DATABASE = "./db.json";
 
     try {
         const res = await fetch(URL_DATABASE);
         
-        if (!res.ok) throw new Error("No se pudo conectar con la base de datos");
+        if (!res.ok) throw new Error("No se pudo conectar con la base de datos musical");
 
-        const datos = await res.json();
+        const canciones = await res.json();
         
-        catalogo.innerHTML = ""; // Limpiamos el mensaje de carga
+        // Limpiamos el mensaje de carga
+        if (status) status.style.display = 'none';
+        catalogo.innerHTML = ""; 
 
-        datos.forEach(anime => {
-            const card = document.createElement('div');
-            card.className = 'anime-card';
-            card.innerHTML = `
-                <img src="${anime.poster}" onerror="this.src='https://via.placeholder.com/200x300?text=Error+Imagen'">
+        canciones.forEach(track => {
+            // Creamos la tarjeta de la estación/canción
+            const tarjeta = document.createElement('div');
+            tarjeta.className = 'anime-card'; // Mantenemos la clase de tus estilos
+            
+            tarjeta.innerHTML = `
+                <img src="${track.poster}" alt="${track.titulo}" loading="lazy">
                 <div class="card-info">
-                    <strong>${anime.titulo}</strong><br>
-                    <small>${anime.episodio}</small>
+                    <strong>${track.titulo}</strong><br>
+                    <small style="color: #888;">${track.episodio}</small>
                 </div>
             `;
-            
-            card.onclick = () => {
-                // Forzamos que el link sea de EMBED
-                let cleanUrl = anime.videoUrl.replace("watch?v=", "embed/");
-                document.getElementById('video-player').src = cleanUrl;
-                document.getElementById('current-title').innerText = anime.titulo;
-                window.scrollTo({top: 0, behavior: 'smooth'});
+
+            // EVENTO AL HACER CLIC
+            tarjeta.onclick = () => {
+                // INTEGRACIÓN DE LA LÍNEA SOLICITADA:
+                // Añadimos "?autoplay=1&mute=0" para que intente reproducir solo al cambiar
+                reproductor.src = track.videoUrl + "?autoplay=1&mute=0";
+                
+                // Actualizamos el título en la pantalla
+                tituloPrincipal.innerText = `Escuchando: ${track.titulo}`;
+
+                // Efecto de scroll hacia el reproductor
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             };
-            
-            catalogo.appendChild(card);
+
+            catalogo.appendChild(tarjeta);
         });
 
+        console.log("¡Streaming de música listo!");
+
     } catch (error) {
-        console.error(error);
-        status.innerHTML = `<b style="color:red">Error de conexión:</b> Verifica que tu db.json sea público y tenga formato correcto.`;
+        console.error("Error:", error);
+        catalogo.innerHTML = `<p style="color:red; padding: 20px;">Error al cargar la música. Revisa tu archivo db.json.</p>`;
     }
 }
+
+// Iniciar cuando el documento esté listo
+document.addEventListener('DOMContentLoaded', cargarMusica);
