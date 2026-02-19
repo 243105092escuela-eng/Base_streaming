@@ -1,24 +1,34 @@
-// script.js
-async function cargarAnime() {
-    // 1. Buscamos el archivo de datos
-    const respuesta = await fetch('db.json');
-    const datos = await respuesta.json();
-
-    // 2. Seleccionamos el lugar donde queremos mostrar los videos
-    const contenedor = document.getElementById('lista-anime');
-
-    // 3. Recorremos los datos y creamos el HTML para cada anime
-    datos.forEach(anime => {
-        const tarjeta = `
-            <div class="anime-card">
+// Función para cargar los datos del JSON
+async function loadAnime() {
+    try {
+        // Buscamos el archivo db.json en la misma carpeta
+        const response = await fetch('db.json');
+        const animes = await response.json();
+        
+        const listContainer = document.getElementById('anime-list');
+        
+        animes.forEach(anime => {
+            // Crear el elemento visual para cada anime
+            const card = document.createElement('div');
+            card.classList.add('anime-card');
+            card.innerHTML = `
                 <img src="${anime.poster}" alt="${anime.titulo}">
-                <h3>${anime.titulo}</h3>
-                <button onclick="reproducir('${anime.videoUrl}')">Ver ahora</button>
-            </div>
-        `;
-        contenedor.innerHTML += tarjeta;
-    });
+                <h3>${anime.titulo} - ${anime.episodio}</h3>
+            `;
+            
+            // Evento para cambiar el video al hacer clic
+            card.onclick = () => {
+                document.getElementById('video-player').src = anime.videoUrl;
+                document.getElementById('current-title').innerText = `${anime.titulo} - ${anime.episodio}`;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+            
+            listContainer.appendChild(card);
+        });
+    } catch (error) {
+        console.error("Error cargando la base de datos:", error);
+    }
 }
 
-// Ejecutar la función al cargar la página
-cargarAnime();
+// Iniciar la carga al abrir la página
+loadAnime();
