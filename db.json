@@ -2,15 +2,22 @@
   {
     "id": 1,
     "titulo": "Chainsaw Man",
-    "episodio": "Trailer",
-    "poster": "https://www.crunchyroll.com/imgsrv/display/thumbnail/480x720/catalog/crunchyroll/922742d10348d4b3f025fbc0734005ba.jpe",
+    "episodio": "Trailer Oficial",
+    "poster": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4b/Chainsaw_man_vol_1_cover.png/220px-Chainsaw_man_vol_1_cover.png",
     "videoUrl": "https://www.youtube.com/embed/v4yLeN6G69s"
   },
   {
     "id": 2,
     "titulo": "One Piece",
-    "episodio": "Wano",
-    "poster": "https://www.crunchyroll.com/imgsrv/display/thumbnail/480x720/catalog/crunchyroll/18988f119a42484252ef0e8156112f4b.jpe",
+    "episodio": "Wano Kuni",
+    "poster": "https://images.justwatch.com/poster/305510617/s592/one-piece.webp",
     "videoUrl": "https://www.youtube.com/embed/S8_YwSjs89I"
+  },
+  {
+    "id": 3,
+    "titulo": "Demon Slayer",
+    "episodio": "Trailer",
+    "poster": "https://m.media-amazon.com/images/I/71u9S+fS7UL._AC_UF894,1000_QL80_.jpg",
+    "videoUrl": "https://www.youtube.com/embed/VQGCKyNIszU"
   }
 ]
