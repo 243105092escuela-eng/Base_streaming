@@ -7,12 +7,12 @@
     "videoUrl": "https://www.youtube.com/embed/jfKfPfyJRdk"
   },
   {
-    "id": 2,
-    "titulo": "Smooth Jazz Live",
-    "episodio": "Coffee Shop Music",
-    "poster": "https://i.ytimg.com/vi/h2m_XoI-E_o/maxresdefault.jpg",
-    "videoUrl": "https://www.youtube.com/embed/h2m_XoI-E_o"
-  },
+  "id": 2,
+  "titulo": "Jazz House Radio 24/7",
+  "episodio": "Jazz Chillout & Lounge Music",
+  "poster": "https://i.ytimg.com/vi/xb3P8JinEuw/maxresdefault.jpg",
+  "videoUrl": "https://www.youtube.com/watch?v=xb3P8JinEuw"
+},
   {
     "id": 3,
     "titulo": "Synthwave Radio",
