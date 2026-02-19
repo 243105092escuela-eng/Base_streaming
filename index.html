@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeatFlow | Tu Radio 24/7</title>
+    <title>BeatFlow | Registro y Streaming</title>
     <style>
-        /* COLORES ESTILO SYNTHWAVE */
         :root {
-            --primary: #bc13fe; /* Morado neón */
-            --secondary: #ff00de; /* Rosa neón */
+            --primary: #bc13fe; 
+            --secondary: #ff00de; 
             --bg-dark: #050505;
             --bg-card: #121212;
             --text-main: #ffffff;
@@ -18,141 +17,119 @@
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
 
-        header {
-            background: linear-gradient(135deg, #1a0033 0%, #050505 100%);
-            padding: 25px;
-            text-align: center;
-            border-bottom: 3px solid var(--primary);
-            box-shadow: 0 0 15px var(--primary);
+        /* TARJETA DE IDENTIDAD */
+        #user-card {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(18, 18, 18, 0.9);
+            padding: 8px 15px;
+            border-radius: 50px;
+            border: 1px solid var(--primary);
+            display: none; /* Se activa con JS */
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.4);
+            backdrop-filter: blur(5px);
         }
 
-        header h1 {
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            font-size: 2rem;
-            text-shadow: 0 0 10px var(--primary);
-        }
-
-        header span {
-            color: var(--secondary);
-            text-shadow: 0 0 10px var(--secondary);
-        }
-
-        /* REPRODUCTOR */
-        .player-section {
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-
-        #current-title {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: var(--secondary);
-            font-weight: 300;
-        }
-
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%; 
-            height: 0;
-            background: #000;
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(188, 19, 254, 0.2);
-            overflow: hidden;
-            border: 1px solid #333;
-        }
-
-        /* ATRIBUTOS PARA AUTOPLAY */
-        .video-container iframe {
-            position: absolute;
+        /* MODAL DE REGISTRO */
+        #register-modal {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            border: none;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
         }
 
-        /* GRID DE ESTACIONES */
-        .catalog-container {
-            max-width: 1100px;
-            margin: 50px auto;
-            padding: 0 20px;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            margin-bottom: 30px;
-            border-left: 5px solid var(--secondary);
-            padding-left: 15px;
-        }
-
-        #anime-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 30px;
-        }
-
-        /* TARJETAS MUSICALES */
-        .anime-card {
+        .modal-content {
             background: var(--bg-card);
-            border-radius: 12px;
-            overflow: hidden;
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid var(--primary);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 0 30px var(--primary);
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #222;
+            color: white;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .btn-register {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border 0.3s;
-            border: 1px solid #222;
-        }
-
-        .anime-card:hover {
-            transform: scale(1.08);
-            border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(188, 19, 254, 0.4);
-        }
-
-        .anime-card img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            filter: grayscale(30%);
+            font-weight: bold;
+            width: 85%;
             transition: 0.3s;
         }
 
-        .anime-card:hover img {
-            filter: grayscale(0%);
-        }
+        .btn-register:hover { background: var(--secondary); }
 
-        .card-info {
-            padding: 15px;
+        /* HEADER Y REPRODUCTOR */
+        header {
+            background: #111;
+            padding: 20px;
             text-align: center;
+            border-bottom: 2px solid var(--primary);
         }
 
-        .card-info strong {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 1rem;
+        .player-section { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        .video-container {
+            position: relative; padding-bottom: 56.25%; height: 0;
+            background: #000; border-radius: 15px; overflow: hidden;
+            border: 1px solid #333;
         }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-        .card-info small {
-            color: var(--text-gray);
-            font-size: 0.8rem;
-        }
-
-        footer {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-gray);
-            font-size: 0.8rem;
-            background: #000;
-        }
+        /* GRID */
+        .catalog-container { max-width: 1000px; margin: 40px auto; padding: 20px; }
+        #anime-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; }
+        .anime-card { background: var(--bg-card); border-radius: 10px; cursor: pointer; border: 1px solid #222; transition: 0.3s; text-align: center;}
+        .anime-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .anime-card img { width: 100%; height: 150px; object-fit: cover; }
+        .card-info { padding: 10px; }
     </style>
 </head>
 <body>
+
+    <div id="user-card">
+        <div style="width: 30px; height: 30px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center;">👤</div>
+        <span id="display-name"></span>
+    </div>
+
+    <div id="register-modal">
+        <div class="modal-content">
+            <h2 style="color: var(--primary);">NUEVA SESIÓN</h2>
+            <p>Ingresa tu nombre para identificarte en el sistema:</p>
+            <input type="text" id="user-input" placeholder="Nombre de usuario...">
+            <button class="btn-register" onclick="registrarUsuario()">ENTRAR</button>
+        </div>
+    </div>
 
     <header>
         <h1>BEAT<span>FLOW</span></h1>
@@ -160,29 +137,19 @@
 
     <main>
         <section class="player-section">
-            <h2 id="current-title">Selecciona una estación para comenzar</h2>
+            <h2 id="current-title" style="color: var(--secondary);">Selecciona una estación</h2>
             <div class="video-container">
-                <iframe 
-                    id="video-player" 
-                    src="" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-                </iframe>
+                <iframe id="video-player" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
             </div>
         </section>
 
         <section class="catalog-container">
-            <h2 class="section-title">Estaciones Disponibles</h2>
+            <h2 style="border-left: 4px solid var(--primary); padding-left: 10px;">BIBLIOTECA MUSICAL</h2>
             <div id="anime-list">
-                <p id="status" style="color: var(--text-gray);">Sincronizando frecuencias...</p>
+                <p id="status">Cargando estaciones...</p>
             </div>
         </section>
     </main>
-
-    <footer>
-        <p>BeatFlow Radio &copy; 2026</p>
-        <p>Transmisiones vía YouTube Media Player</p>
-    </footer>
 
     <script src="script.js"></script>
 </body>
