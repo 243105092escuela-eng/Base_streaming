@@ -3,38 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnimeStream Pro</title>
+    <title>AnimeStream | Tu Portal de Anime</title>
     <style>
-        body { background: #0f0f0f; color: white; font-family: sans-serif; margin: 0; }
-        header { background: #1a1a1a; padding: 20px; text-align: center; border-bottom: 3px solid #ff4500; }
-        
-        .main-player { max-width: 900px; margin: 20px auto; padding: 0 15px; }
-        .iframe-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; background: #000; }
-        .iframe-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        /* VARIABLES DE COLOR */
+        :root {
+            --primary: #ff4500;
+            --bg-dark: #0a0a0a;
+            --bg-card: #161616;
+            --text-main: #ffffff;
+            --text-gray: #b3b3b3;
+        }
 
-        .catalog { max-width: 1200px; margin: 40px auto; padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
-        .anime-card { background: #1e1e1e; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.3s; border: 1px solid #333; }
-        .anime-card:hover { transform: scale(1.05); border-color: #ff4500; }
-        .anime-card img { width: 100%; height: 250px; object-fit: cover; }
-        .anime-card h3 { font-size: 14px; padding: 10px; margin: 0; text-align: center; }
+        /* ESTILOS GENERALES */
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: linear-gradient(to bottom, #1a1a1a, var(--bg-dark));
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            margin: 0;
+            letter-spacing: 2px;
+            font-size: 1.8rem;
+        }
+
+        header span {
+            color: var(--primary);
+        }
+
+        /* CONTENEDOR DEL REPRODUCTOR */
+        .player-section {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        #current-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+            padding-left: 15px;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+            background: #000;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* CUADRÍCULA DE ANIMES */
+        .catalog-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+
+        #anime-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 25px;
+        }
+
+        /* TARJETAS DE ANIME (EL DISEÑO) */
+        .anime-card {
+            background: var(--bg-card);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #222;
+        }
+
+        .anime-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(255, 69, 0, 0.3);
+        }
+
+        .anime-card img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            transition: 0.3s;
+        }
+
+        .anime-card:hover img {
+            filter: brightness(1.1);
+        }
+
+        .card-info {
+            padding: 12px;
+        }
+
+        .card-info h3 {
+            font-size: 0.95rem;
+            margin: 0 0 5px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-info span {
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            #anime-list {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 15px;
+            }
+            header h1 { font-size: 1.4rem; }
+        }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>ANIME<span style="color:#ff4500">STREAM</span></h1>
-</header>
+    <header>
+        <h1>ANIME<span>STREAM</span></h1>
+    </header>
 
-<div class="main-player">
-    <h2 id="current-title">Selecciona un anime abajo</h2>
-    <div class="iframe-container">
-        <iframe id="video-player" src="" allowfullscreen></iframe>
-    </div>
-</div>
+    <main>
+        <section class="player-section">
+            <h2 id="current-title">Bienvenido, selecciona un anime</h2>
+            <div class="video-container">
+                <iframe id="video-player" src="" allowfullscreen></iframe>
+            </div>
+        </section>
 
-<div class="catalog" id="anime-list">
-    </div>
+        <section class="catalog-container">
+            <h2 class="section-title">Explorar Catálogo</h2>
+            <div id="anime-list">
+                <p style="color: var(--text-gray);">Cargando catálogo...</p>
+            </div>
+        </section>
+    </main>
 
-<script src="script.js"></script>
+    <footer style="text-align: center; padding: 40px; color: var(--text-gray); font-size: 0.8rem;">
+        <p>&copy; 2024 AnimeStream Project. Contenido vía YouTube Embed.</p>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
