@@ -3,21 +3,21 @@
     "id": 1,
     "titulo": "Chainsaw Man",
     "episodio": "Trailer Oficial",
-    "poster": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4b/Chainsaw_man_vol_1_cover.png/220px-Chainsaw_man_vol_1_cover.png",
+    "poster": "https://m.media-amazon.com/images/M/MV5BNmU2N2E1ZGMtYjE4MS00NzQ0LWI4YzUtZDIzY2I3N2QzYmY3XkEyXkFqcGc@._V1_.jpg",
     "videoUrl": "https://www.youtube.com/embed/v4yLeN6G69s"
   },
   {
     "id": 2,
     "titulo": "One Piece",
     "episodio": "Wano Kuni",
-    "poster": "https://images.justwatch.com/poster/305510617/s592/one-piece.webp",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMjE4MDYzNzg3MV5BMl5BanBnXkFtZTgwNjIyMzE0MDE@._V1_.jpg",
     "videoUrl": "https://www.youtube.com/embed/S8_YwSjs89I"
   },
   {
     "id": 3,
     "titulo": "Demon Slayer",
     "episodio": "Trailer",
-    "poster": "https://m.media-amazon.com/images/I/71u9S+fS7UL._AC_UF894,1000_QL80_.jpg",
+    "poster": "https://m.media-amazon.com/images/M/MV5BNTkwOTE1ZDYtYWQ3AS00MmU3LThmN2EtNmI2ZGM2OTY1ZDIxXkEyXkFqcGc@._V1_.jpg",
     "videoUrl": "https://www.youtube.com/embed/VQGCKyNIszU"
   }
 ]
