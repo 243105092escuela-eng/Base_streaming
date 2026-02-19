@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "titulo": "Naruto Shippuden",
+    "episodio": 1,
+    "poster": "https://url-de-tu-imagen.jpg",
+    "videoUrl": "https://www.youtube.com/embed/videoID1"
+  },
+  {
+    "id": 2,
+    "titulo": "One Piece",
+    "episodio": 1000,
+    "poster": "https://url-de-tu-imagen2.jpg",
+    "videoUrl": "https://www.youtube.com/embed/videoID2"
+  }
+]
