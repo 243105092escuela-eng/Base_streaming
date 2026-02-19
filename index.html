@@ -2,86 +2,56 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnimeStream | Live</title>
+    <title>AnimeStream Test</title>
     <style>
-        :root { --primary: #ff4500; --bg: #0a0a0a; --card: #161616; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; text-align: center; }
-        header { padding: 20px; border-bottom: 2px solid var(--primary); background: #1a1a1a; }
-        .player-section { max-width: 800px; margin: 20px auto; padding: 10px; }
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 8px; overflow: hidden; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; padding: 20px; max-width: 1000px; margin: auto; }
-        .anime-card { background: var(--card); border-radius: 8px; cursor: pointer; transition: 0.3s; border: 1px solid #333; overflow: hidden; }
-        .anime-card:hover { transform: scale(1.05); border-color: var(--primary); }
-        .anime-card img { width: 100%; height: 200px; object-fit: cover; }
-        .card-info { padding: 10px; font-size: 14px; }
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
+        .card { border: 1px solid #ff4500; cursor: pointer; padding: 10px; background: #111; }
+        .card img { width: 100%; height: auto; }
+        #player { width: 80%; height: 450px; margin: 20px auto; border: 2px solid #ff4500; }
     </style>
 </head>
 <body>
-
-<header><h1>ANIME<span style="color:var(--primary)">STREAM</span></h1></header>
-
-<div class="player-section">
-    <h2 id="current-title">Selecciona un video</h2>
-    <div class="video-container">
-        <iframe id="video-player" src="" allowfullscreen></iframe>
+    <h1>ANIME STREAM</h1>
+    <div id="player-container">
+        <iframe id="main-video" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
     </div>
-</div>
 
-<div class="catalog" id="anime-list">
-    <p id="status">Cargando base de datos...</p>
-</div>
+    <div id="anime-list" class="grid">
+        </div>
 
-<script>
-    // USAMOS UNA RUTA RELATIVA SIMPLE
-    async function iniciarApp() {
-        const catalogo = document.getElementById('anime-list');
-        const status = document.getElementById('status');
-
-        try {
-            // Intentamos cargar db.json
-            const res = await fetch('./db.json');
-            
-            if (!res.ok) throw new Error("Archivo db.json no encontrado");
-
-            const datos = await res.json();
-            
-            if (datos.length === 0) {
-                status.innerText = "La base de datos está vacía.";
-                return;
+    <script>
+        // DATOS DE RESPALDO (Si el JSON falla, cargará estos)
+        const backupData = [
+            {
+                "titulo": "Chainsaw Man",
+                "poster": "https://www.crunchyroll.com/imgsrv/display/thumbnail/480x720/catalog/crunchyroll/922742d10348d4b3f025fbc0734005ba.jpe",
+                "videoUrl": "https://www.youtube.com/embed/v4yLeN6G69s"
             }
+        ];
 
-            status.style.display = 'none';
-            catalogo.innerHTML = "";
+        async function cargar() {
+            const list = document.getElementById('anime-list');
+            try {
+                // Intentamos traer tu JSON
+                const res = await fetch('db.json');
+                const data = res.ok ? await res.json() : backupData;
 
-            datos.forEach(anime => {
-                const card = document.createElement('div');
-                card.className = 'anime-card';
-                card.innerHTML = `
-                    <img src="${anime.poster}">
-                    <div class="card-info">
-                        <strong>${anime.titulo}</strong><br>
-                        <small>${anime.episodio}</small>
-                    </div>
-                `;
-                
-                card.onclick = () => {
-                    document.getElementById('video-player').src = anime.videoUrl;
-                    document.getElementById('current-title').innerText = anime.titulo;
-                    window.scrollTo({top: 0, behavior: 'smooth'});
-                };
-                
-                catalogo.appendChild(card);
-            });
-
-        } catch (error) {
-            console.error(error);
-            status.innerHTML = `<span style="color:red">Error: No se pudo cargar db.json. Revisa que el archivo exista en tu GitHub.</span>`;
+                list.innerHTML = "";
+                data.forEach(anime => {
+                    const item = document.createElement('div');
+                    item.className = 'card';
+                    item.innerHTML = `<img src="${anime.poster}"><h3>${anime.titulo}</h3>`;
+                    item.onclick = () => {
+                        document.getElementById('main-video').src = anime.videoUrl;
+                    };
+                    list.appendChild(item);
+                });
+            } catch (e) {
+                list.innerHTML = "Error al conectar con la base de datos.";
+            }
         }
-    }
-
-    window.onload = iniciarApp;
-</script>
+        window.onload = cargar;
+    </script>
 </body>
 </html>
