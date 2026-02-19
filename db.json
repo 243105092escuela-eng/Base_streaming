@@ -9,9 +9,9 @@
   {
     "id": 2,
     "titulo": "Smooth Jazz Live",
-    "episodio": "Ambiente Relajante",
-    "poster": "https://i.ytimg.com/vi/5W0S1LlSOnA/maxresdefault.jpg",
-    "videoUrl": "https://www.youtube.com/embed/5W0S1LlSOnA"
+    "episodio": "Coffee Shop Music",
+    "poster": "https://i.ytimg.com/vi/h2m_XoI-E_o/maxresdefault.jpg",
+    "videoUrl": "https://www.youtube.com/embed/h2m_XoI-E_o"
   },
   {
     "id": 3,
@@ -22,8 +22,8 @@
   },
   {
     "id": 4,
-    "titulo": "Piano Relajante",
-    "episodio": "Música para Dormir",
+    "titulo": "Coffee Shop Piano",
+    "episodio": "Música Relajante",
     "poster": "https://i.ytimg.com/vi/77ZozI0rw7w/maxresdefault.jpg",
     "videoUrl": "https://www.youtube.com/embed/77ZozI0rw7w"
   }
