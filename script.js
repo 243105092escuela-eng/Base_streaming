@@ -1,25 +1,28 @@
 // --- 1. LÓGICA DE USUARIOS Y REGISTRO ---
 
-// Función para registrar un nuevo usuario y guardarlo en la lista
-function registrarUsuario() {
+// Clave usada en el storage compartido
+const STORAGE_KEY_USERS = 'beatflow_users_list';
+
+// Función para registrar un nuevo usuario
+async function registrarUsuario() {
     const nombreInput = document.getElementById('user-input');
     const nombre = nombreInput.value.trim();
-    
+
     if (nombre !== "") {
-        // 1. Obtener lista de usuarios previa o crear una nueva
-        let usuarios = JSON.parse(localStorage.getItem('beatflow_users_list')) || [];
-        
-        // 2. Agregar el nombre a la lista si no existe ya
+        // 1. Obtener lista compartida actual
+        let usuarios = await obtenerUsuariosCompartidos();
+
+        // 2. Agregar si no existe
         if (!usuarios.includes(nombre)) {
             usuarios.push(nombre);
-            localStorage.setItem('beatflow_users_list', JSON.stringify(usuarios));
+            await guardarUsuariosCompartidos(usuarios);
         }
 
-        // 3. Establecer como usuario actual
+        // 3. Guardar sesión local (solo para esta pestaña/dispositivo)
         localStorage.setItem('beatflow_current_user', nombre);
-        
+
         mostrarInterfazUsuario(nombre);
-        actualizarListaPublica();
+        await actualizarListaPublica();
     } else {
         alert("Por favor, ingresa un nombre para continuar.");
     }
@@ -31,35 +34,57 @@ function mostrarInterfazUsuario(nombre) {
     const userCard = document.getElementById('user-card');
     const displayName = document.getElementById('display-name');
 
-    if(modal) modal.style.display = 'none';
-    if(userCard) userCard.style.display = 'flex';
-    if(displayName) displayName.innerText = nombre;
+    if (modal) modal.style.display = 'none';
+    if (userCard) userCard.style.display = 'flex';
+    if (displayName) displayName.innerText = nombre;
 }
 
-// Cierra la sesión borrando solo al usuario "activo"
+// Cierra sesión local (no borra de la lista pública compartida)
 function cerrarSesion() {
     localStorage.removeItem('beatflow_current_user');
     window.location.reload();
 }
 
-// Muestra los nombres de todos los que se han registrado en esa PC
-function actualizarListaPublica() {
+
+// --- 2. STORAGE COMPARTIDO ---
+
+// Lee la lista de usuarios desde el storage compartido
+async function obtenerUsuariosCompartidos() {
+    try {
+        const result = await window.storage.get(STORAGE_KEY_USERS, true); // shared = true
+        return result ? JSON.parse(result.value) : [];
+    } catch {
+        return [];
+    }
+}
+
+// Guarda la lista de usuarios en el storage compartido
+async function guardarUsuariosCompartidos(usuarios) {
+    try {
+        await window.storage.set(STORAGE_KEY_USERS, JSON.stringify(usuarios), true); // shared = true
+    } catch (err) {
+        console.error("Error al guardar usuarios compartidos:", err);
+    }
+}
+
+// Renderiza la lista pública de oyentes (desde storage compartido)
+async function actualizarListaPublica() {
     const listaDiv = document.getElementById('user-list');
-    const usuarios = JSON.parse(localStorage.getItem('beatflow_users_list')) || [];
-    
-    if (listaDiv) {
-        if (usuarios.length > 0) {
-            listaDiv.innerHTML = usuarios.map(u => 
-                `<span class="user-tag">${u}</span>`
-            ).join("");
-        } else {
-            listaDiv.innerHTML = "<p style='color: #666; font-size: 0.8rem;'>No hay oyentes registrados aún.</p>";
-        }
+    if (!listaDiv) return;
+
+    const usuarios = await obtenerUsuariosCompartidos();
+
+    if (usuarios.length > 0) {
+        listaDiv.innerHTML = usuarios.map(u =>
+            `<span class="user-tag">${u}</span>`
+        ).join("");
+    } else {
+        listaDiv.innerHTML = "<p style='color: #666; font-size: 0.8rem;'>No hay oyentes registrados aún.</p>";
     }
 }
 
 
-// --- 2. LÓGICA DE CARGA DE MÚSICA (JSON) ---
+// --- 3. LÓGICA DE CARGA DE MÚSICA (JSON) ---
 
 async function cargarMusica() {
     const catalogo = document.getElementById('anime-list');
@@ -67,26 +92,23 @@ async function cargarMusica() {
     const tituloPrincipal = document.getElementById('current-title');
 
     try {
-        // El punto y la diagonal (./) aseguran que busque en la misma carpeta del repositorio
         const res = await fetch('./db.json');
-        
         if (!res.ok) throw new Error("No se pudo cargar el archivo db.json");
 
         const canciones = await res.json();
-        catalogo.innerHTML = ""; // Limpiar mensaje de carga
+        catalogo.innerHTML = "";
 
         canciones.forEach(track => {
             const tarjeta = document.createElement('div');
             tarjeta.className = 'anime-card';
             tarjeta.innerHTML = `
                 <img src="${track.poster}" alt="${track.titulo}">
-                <div class="card-info">
-                    <strong>${track.titulo}</strong><br>
-                    <small>${track.episodio}</small>
+                <div class="card-info" style="padding: 10px;">
+                    <strong style="color: #fff; font-size: 0.9rem;">${track.titulo}</strong><br>
+                    <small style="color: #888;">${track.episodio}</small>
                 </div>
             `;
 
-            // Al hacer clic, se activa el video con Autoplay
             tarjeta.onclick = () => {
                 reproductor.src = track.videoUrl + "?autoplay=1&mute=0&rel=0";
                 tituloPrincipal.innerText = `Escuchando: ${track.titulo}`;
@@ -105,18 +127,20 @@ async function cargarMusica() {
 }
 
 
-// --- 3. ARRANQUE DE LA APP ---
+// --- 4. ARRANQUE DE LA APP ---
 
-document.addEventListener('DOMContentLoaded', () => {
-    // A. Verificar si ya hay una sesión activa
+document.addEventListener('DOMContentLoaded', async () => {
+    // A. Ocultar modal de inmediato si ya hay sesión (evita flash)
     const usuarioActual = localStorage.getItem('beatflow_current_user');
     if (usuarioActual) {
+        const modal = document.getElementById('register-modal');
+        if (modal) modal.style.display = 'none';
         mostrarInterfazUsuario(usuarioActual);
     }
 
-    // B. Renderizar la lista de usuarios conocidos
-    actualizarListaPublica();
-    
-    // C. Cargar los datos del JSON
+    // B. Cargar lista compartida de oyentes
+    await actualizarListaPublica();
+
+    // C. Cargar música
     cargarMusica();
 });
