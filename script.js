@@ -1,42 +1,25 @@
-// ============================================================
-//  BEATFLOW — script.js
-//  Backend: Supabase (REST API + Realtime)
-// ============================================================
-
-
-// --- 0. CONFIGURACIÓN SUPABASE ---
-
-const SUPABASE_URL = 'https://nzzabdtnixfwbtjuwlnp.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56emFiZHRuaXhmd2J0anV3bG5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODM3NDAsImV4cCI6MjA4OTg1OTc0MH0.ELsa3rj4YyS7pwVECYGrB7pviDwkRe3WsNSqqv9P70k';
-
-
-// ============================================================
 // --- 1. LÓGICA DE USUARIOS Y REGISTRO ---
-// ============================================================
 
-async function registrarUsuario() {
+let editIndex = null;
+
+function registrarUsuario() {
     const nombreInput = document.getElementById('user-input');
     const nombre = nombreInput.value.trim();
 
-    if (!nombre) {
-        alert("Por favor, ingresa un nombre para continuar.");
-        return;
-    }
+    if (nombre !== "") {
+        let usuarios = JSON.parse(localStorage.getItem('beatflow_users_list')) || [];
 
-    // Verificar si el nombre ya existe antes de insertar
-    const usuarios = await obtenerUsuarios();
-    if (!usuarios.includes(nombre)) {
-        const ok = await insertarUsuario(nombre);
-        if (!ok) {
-            alert("Hubo un error al registrarte. Intenta de nuevo.");
-            return;
+        if (!usuarios.includes(nombre)) {
+            usuarios.push(nombre);
+            localStorage.setItem('beatflow_users_list', JSON.stringify(usuarios));
         }
-    }
 
-    // Guardar sesión local
-    localStorage.setItem('beatflow_current_user', nombre);
-    mostrarInterfazUsuario(nombre);
-    await actualizarListaPublica();
+        localStorage.setItem('beatflow_current_user', nombre);
+        mostrarInterfazUsuario(nombre);
+        actualizarListaPublica();
+    } else {
+        alert("Por favor, ingresa un nombre para continuar.");
+    }
 }
 
 function mostrarInterfazUsuario(nombre) {
@@ -54,104 +37,63 @@ function cerrarSesion() {
     window.location.reload();
 }
 
+// --- 2. LISTA DE USUARIOS CON EDITAR / ELIMINAR ---
 
-// ============================================================
-// --- 2. SUPABASE — FUNCIONES DE DATOS ---
-// ============================================================
-
-async function obtenerUsuarios() {
-    try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/usuarios?select=nombre&order=created_at.asc`, {
-            headers: {
-                'apikey': SUPABASE_KEY,
-                'Authorization': `Bearer ${SUPABASE_KEY}`
-            }
-        });
-
-        if (!res.ok) {
-            console.error("Error al obtener usuarios:", await res.text());
-            return [];
-        }
-
-        const data = await res.json();
-        return data.map(u => u.nombre);
-
-    } catch (err) {
-        console.error("Error de red al obtener usuarios:", err);
-        return [];
-    }
-}
-
-async function insertarUsuario(nombre) {
-    try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/usuarios`, {
-            method: 'POST',
-            headers: {
-                'apikey': SUPABASE_KEY,
-                'Authorization': `Bearer ${SUPABASE_KEY}`,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=minimal'
-            },
-            body: JSON.stringify({ nombre })
-        });
-
-        if (!res.ok) {
-            console.error("Error al insertar usuario:", await res.text());
-            return false;
-        }
-
-        return true;
-
-    } catch (err) {
-        console.error("Error de red al insertar usuario:", err);
-        return false;
-    }
-}
-
-async function actualizarListaPublica() {
+function actualizarListaPublica() {
     const listaDiv = document.getElementById('user-list');
+    const usuarios = JSON.parse(localStorage.getItem('beatflow_users_list')) || [];
+
     if (!listaDiv) return;
 
-    const usuarios = await obtenerUsuarios();
-
     if (usuarios.length > 0) {
-        listaDiv.innerHTML = usuarios
-            .map(u => `<span class="user-tag">${u}</span>`)
-            .join('');
+        listaDiv.innerHTML = usuarios.map((u, i) => `
+            <span class="user-tag">
+                ${u}
+                <button onclick="editarUsuario(${i})" style="background:none;border:none;cursor:pointer;color:#bc13fe;font-size:0.75rem;padding:0 2px;" title="Editar">✏️</button>
+                <button onclick="eliminarUsuario(${i})" style="background:none;border:none;cursor:pointer;color:#ff4444;font-size:0.75rem;padding:0 2px;" title="Eliminar">✕</button>
+            </span>
+        `).join('');
     } else {
         listaDiv.innerHTML = "<p style='color: #666; font-size: 0.8rem;'>No hay oyentes registrados aún.</p>";
     }
 }
 
+function eliminarUsuario(index) {
+    let usuarios = JSON.parse(localStorage.getItem('beatflow_users_list')) || [];
+    const nombre = usuarios[index];
+    usuarios.splice(index, 1);
+    localStorage.setItem('beatflow_users_list', JSON.stringify(usuarios));
 
-// ============================================================
-// --- 3. SUPABASE REALTIME — Actualización automática ---
-// ============================================================
-
-function iniciarRealtime() {
-    if (typeof window.supabase === 'undefined') {
-        console.warn("SDK de Supabase no encontrado. El tiempo real no estará activo.");
-        return;
+    // Si elimina al usuario activo, ocultar la tarjeta
+    if (localStorage.getItem('beatflow_current_user') === nombre) {
+        localStorage.removeItem('beatflow_current_user');
+        const userCard = document.getElementById('user-card');
+        if (userCard) userCard.style.display = 'none';
     }
 
-    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    client
-        .channel('oyentes-online')
-        .on(
-            'postgres_changes',
-            { event: 'INSERT', schema: 'public', table: 'usuarios' },
-            () => actualizarListaPublica()
-        )
-        .subscribe((status) => {
-            console.log('Realtime Supabase:', status);
-        });
+    actualizarListaPublica();
 }
 
+function editarUsuario(index) {
+    let usuarios = JSON.parse(localStorage.getItem('beatflow_users_list')) || [];
+    const nuevoNombre = prompt("Editar nombre:", usuarios[index]);
+    if (nuevoNombre === null || nuevoNombre.trim() === '') return;
 
-// ============================================================
-// --- 4. CARGA DE MÚSICA (db.json) ---
-// ============================================================
+    const nombreAnterior = usuarios[index];
+    usuarios[index] = nuevoNombre.trim();
+    localStorage.setItem('beatflow_users_list', JSON.stringify(usuarios));
+
+    // Si editó al usuario activo, actualizar la tarjeta
+    if (localStorage.getItem('beatflow_current_user') === nombreAnterior) {
+        localStorage.setItem('beatflow_current_user', nuevoNombre.trim());
+        const displayName = document.getElementById('display-name');
+        if (displayName) displayName.innerText = nuevoNombre.trim();
+    }
+
+    actualizarListaPublica();
+}
+
+// --- 3. LÓGICA DE CARGA DE MÚSICA (JSON) ---
 
 async function cargarMusica() {
     const catalogo        = document.getElementById('anime-list');
@@ -160,24 +102,24 @@ async function cargarMusica() {
 
     try {
         const res = await fetch('./db.json');
-        if (!res.ok) throw new Error("No se pudo cargar db.json");
+        if (!res.ok) throw new Error("No se pudo cargar el archivo db.json");
 
         const canciones = await res.json();
-        catalogo.innerHTML = '';
+        catalogo.innerHTML = "";
 
         canciones.forEach(track => {
             const tarjeta = document.createElement('div');
             tarjeta.className = 'anime-card';
             tarjeta.innerHTML = `
                 <img src="${track.poster}" alt="${track.titulo}">
-                <div class="card-info" style="padding: 10px;">
-                    <strong style="color: #fff; font-size: 0.9rem;">${track.titulo}</strong><br>
-                    <small style="color: #888;">${track.episodio}</small>
+                <div class="card-info">
+                    <strong>${track.titulo}</strong><br>
+                    <small>${track.episodio}</small>
                 </div>
             `;
 
             tarjeta.onclick = () => {
-                reproductor.src = `${track.videoUrl}?autoplay=1&mute=0&rel=0`;
+                reproductor.src = track.videoUrl + "?autoplay=1&mute=0&rel=0";
                 tituloPrincipal.innerText = `Escuchando: ${track.titulo}`;
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             };
@@ -188,22 +130,14 @@ async function cargarMusica() {
     } catch (error) {
         console.error("Error en cargarMusica:", error);
         if (catalogo) {
-            catalogo.innerHTML = `
-                <p style="color:red; grid-column: 1/-1;">
-                    Error: No se pudieron cargar las estaciones. Revisa tu db.json.
-                </p>`;
+            catalogo.innerHTML = `<p style="color:red; grid-column: 1/-1;">Error: No se pudieron cargar las estaciones de música. Revisa tu db.json.</p>`;
         }
     }
 }
 
+// --- 4. ARRANQUE ---
 
-// ============================================================
-// --- 5. ARRANQUE DE LA APP ---
-// ============================================================
-
-document.addEventListener('DOMContentLoaded', async () => {
-
-    // A. Evitar flash del modal si ya hay sesión activa
+document.addEventListener('DOMContentLoaded', () => {
     const usuarioActual = localStorage.getItem('beatflow_current_user');
     if (usuarioActual) {
         const modal = document.getElementById('register-modal');
@@ -211,12 +145,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         mostrarInterfazUsuario(usuarioActual);
     }
 
-    // B. Cargar lista de oyentes desde Supabase
-    await actualizarListaPublica();
-
-    // C. Activar escucha en tiempo real
-    iniciarRealtime();
-
-    // D. Cargar catálogo de música
+    actualizarListaPublica();
     cargarMusica();
 });
