@@ -1,146 +1,252 @@
-// --- 1. LÓGICA DE USUARIOS Y REGISTRO ---
-
-// Clave usada en el storage compartido
-const STORAGE_KEY_USERS = 'beatflow_users_list';
-
-// Función para registrar un nuevo usuario
-async function registrarUsuario() {
-    const nombreInput = document.getElementById('user-input');
-    const nombre = nombreInput.value.trim();
-
-    if (nombre !== "") {
-        // 1. Obtener lista compartida actual
-        let usuarios = await obtenerUsuariosCompartidos();
-
-        // 2. Agregar si no existe
-        if (!usuarios.includes(nombre)) {
-            usuarios.push(nombre);
-            await guardarUsuariosCompartidos(usuarios);
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeatFlow | Streaming & Community</title>
+    <style>
+        :root {
+            --primary: #bc13fe; 
+            --secondary: #ff00de; 
+            --bg-dark: #050505;
+            --bg-card: #121212;
+            --text-main: #ffffff;
+            --text-gray: #a0a0a0;
         }
 
-        // 3. Guardar sesión local (solo para esta pestaña/dispositivo)
-        localStorage.setItem('beatflow_current_user', nombre);
-
-        mostrarInterfazUsuario(nombre);
-        await actualizarListaPublica();
-    } else {
-        alert("Por favor, ingresa un nombre para continuar.");
-    }
-}
-
-// Muestra la tarjeta superior y oculta el modal
-function mostrarInterfazUsuario(nombre) {
-    const modal = document.getElementById('register-modal');
-    const userCard = document.getElementById('user-card');
-    const displayName = document.getElementById('display-name');
-
-    if (modal) modal.style.display = 'none';
-    if (userCard) userCard.style.display = 'flex';
-    if (displayName) displayName.innerText = nombre;
-}
-
-// Cierra sesión local (no borra de la lista pública compartida)
-function cerrarSesion() {
-    localStorage.removeItem('beatflow_current_user');
-    window.location.reload();
-}
-
-
-// --- 2. STORAGE COMPARTIDO ---
-
-// Lee la lista de usuarios desde el storage compartido
-async function obtenerUsuariosCompartidos() {
-    try {
-        const result = await window.storage.get(STORAGE_KEY_USERS, true); // shared = true
-        return result ? JSON.parse(result.value) : [];
-    } catch {
-        return [];
-    }
-}
-
-// Guarda la lista de usuarios en el storage compartido
-async function guardarUsuariosCompartidos(usuarios) {
-    try {
-        await window.storage.set(STORAGE_KEY_USERS, JSON.stringify(usuarios), true); // shared = true
-    } catch (err) {
-        console.error("Error al guardar usuarios compartidos:", err);
-    }
-}
-
-// Renderiza la lista pública de oyentes (desde storage compartido)
-async function actualizarListaPublica() {
-    const listaDiv = document.getElementById('user-list');
-    if (!listaDiv) return;
-
-    const usuarios = await obtenerUsuariosCompartidos();
-
-    if (usuarios.length > 0) {
-        listaDiv.innerHTML = usuarios.map(u =>
-            `<span class="user-tag">${u}</span>`
-        ).join("");
-    } else {
-        listaDiv.innerHTML = "<p style='color: #666; font-size: 0.8rem;'>No hay oyentes registrados aún.</p>";
-    }
-}
-
-
-// --- 3. LÓGICA DE CARGA DE MÚSICA (JSON) ---
-
-async function cargarMusica() {
-    const catalogo = document.getElementById('anime-list');
-    const reproductor = document.getElementById('video-player');
-    const tituloPrincipal = document.getElementById('current-title');
-
-    try {
-        const res = await fetch('./db.json');
-        if (!res.ok) throw new Error("No se pudo cargar el archivo db.json");
-
-        const canciones = await res.json();
-        catalogo.innerHTML = "";
-
-        canciones.forEach(track => {
-            const tarjeta = document.createElement('div');
-            tarjeta.className = 'anime-card';
-            tarjeta.innerHTML = `
-                <img src="${track.poster}" alt="${track.titulo}">
-                <div class="card-info" style="padding: 10px;">
-                    <strong style="color: #fff; font-size: 0.9rem;">${track.titulo}</strong><br>
-                    <small style="color: #888;">${track.episodio}</small>
-                </div>
-            `;
-
-            tarjeta.onclick = () => {
-                reproductor.src = track.videoUrl + "?autoplay=1&mute=0&rel=0";
-                tituloPrincipal.innerText = `Escuchando: ${track.titulo}`;
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            };
-
-            catalogo.appendChild(tarjeta);
-        });
-
-    } catch (error) {
-        console.error("Error en cargarMusica:", error);
-        if (catalogo) {
-            catalogo.innerHTML = `<p style="color:red; grid-column: 1/-1;">Error: No se pudieron cargar las estaciones de música. Revisa tu db.json.</p>`;
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
-    }
-}
 
+        /* TARJETA DE IDENTIDAD (TOP RIGHT) */
+        #user-card {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(18, 18, 18, 0.9);
+            padding: 8px 15px;
+            border-radius: 50px;
+            border: 1px solid var(--primary);
+            display: none; 
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.4);
+            backdrop-filter: blur(5px);
+        }
 
-// --- 4. ARRANQUE DE LA APP ---
+        .btn-logout {
+            background: none;
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+            cursor: pointer;
+            border-radius: 5px;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            transition: 0.3s;
+        }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // A. Ocultar modal de inmediato si ya hay sesión (evita flash)
-    const usuarioActual = localStorage.getItem('beatflow_current_user');
-    if (usuarioActual) {
-        const modal = document.getElementById('register-modal');
-        if (modal) modal.style.display = 'none';
-        mostrarInterfazUsuario(usuarioActual);
-    }
+        .btn-logout:hover {
+            background: var(--secondary);
+            color: white;
+        }
 
-    // B. Cargar lista compartida de oyentes
-    await actualizarListaPublica();
+        /* MODAL DE REGISTRO */
+        #register-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
 
-    // C. Cargar música
-    cargarMusica();
-});
+        .modal-content {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid var(--primary);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 0 30px var(--primary);
+        }
+
+        input[type="text"] {
+            width: 85%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #222;
+            color: white;
+            margin: 20px 0;
+            text-align: center;
+            outline: none;
+        }
+
+        .btn-register {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 90%;
+            transition: 0.3s;
+        }
+
+        .btn-register:hover {
+            background: var(--secondary);
+        }
+
+        /* REPRODUCTOR Y GRID */
+        header {
+            background: #111;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        header span { color: var(--secondary); }
+
+        .player-section {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: none;
+        }
+
+        .catalog-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        #anime-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 25px;
+        }
+        
+        .anime-card {
+            background: var(--bg-card);
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px solid #222;
+            transition: 0.3s;
+            overflow: hidden;
+        }
+
+        .anime-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .anime-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        
+        /* SECCIÓN USUARIOS REGISTRADOS */
+        .users-section {
+            margin-top: 50px;
+            padding: 20px;
+            background: rgba(20, 20, 20, 0.5);
+            border-radius: 15px;
+            border: 1px dashed #444;
+        }
+
+        #user-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .user-tag {
+            background: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--primary);
+            font-size: 0.85rem;
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="user-card">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 25px; height: 25px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">👤</div>
+            <span id="display-name" style="font-weight: bold; font-size: 0.9rem;"></span>
+        </div>
+        <button class="btn-logout" onclick="cerrarSesion()">SALIR</button>
+    </div>
+
+    <div id="register-modal">
+        <div class="modal-content">
+            <h2 style="color: var(--primary); margin: 0;">BEATFLOW</h2>
+            <p style="color: var(--text-gray);">Crea tu sesión de oyente</p>
+            <input type="text" id="user-input" placeholder="Tu nombre...">
+            <button class="btn-register" onclick="registrarUsuario()">COMENZAR</button>
+        </div>
+    </div>
+
+    <header>
+        <h1>BEAT<span>FLOW</span></h1>
+    </header>
+
+    <main>
+        <section class="player-section">
+            <h2 id="current-title" style="color: var(--secondary); font-weight: 300;">Selecciona una estación</h2>
+            <div class="video-container">
+                <iframe id="video-player" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+        </section>
+
+        <section class="catalog-container">
+            <h2 style="border-left: 4px solid var(--primary); padding-left: 10px; margin-bottom: 25px;">BIBLIOTECA MUSICAL</h2>
+            <div id="anime-list"></div>
+
+            <div class="users-section">
+                <h3 style="margin: 0; font-size: 1rem; color: var(--secondary);">OYENTES REGISTRADOS</h3>
+                <div id="user-list"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- App -->
+    <script src="script.js"></script>
+
+</body>
+</html>
